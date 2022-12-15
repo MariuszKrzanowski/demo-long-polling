@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link rel="stylesheet" href="css/reset.css" />
+    <link rel="stylesheet" href="css/main.css" />
+    <script src="js/main.js" type="module" defer></script>
+  </head>
+  <body>
+    <header>
+      <h1>Long polling web customer</h1>
+    </header>
+    <main>
+      <form action="#">
+        <button data-synchronize="data-synchronize">Synchronize</button>
+        <button data-abort="data-abort">Abort</button>
+        <button data-clean="data-clean">Clean</button>
+        <input data-gsn="data-gsn" value="0" type="number" />
+        <a target="swagger" href="/swagger">Swagger</a>
+      </form>
+      <div
+        class="placeholder"
+        data-placeholder="placeholder"
+        aria-label="Placeholder for received content"
+      >
+        Press Synchronize to start receiving events
+      </div>
+    </main>
+    <footer>
+      <span>Copyright &copy; Mr Matrix Mariusz Krzanowski 2022</span>
+      <span> <a href="">License MIT</a></span>
+    </footer>
+  </body>
+</html>

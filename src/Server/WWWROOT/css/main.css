@@ -1,0 +1,32 @@
+﻿body {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14pt;
+}
+
+button 
+{
+    padding: 0.75rem;
+    font-size: 1rem;
+}
+
+input 
+{
+    padding: 0.25em;
+    font-size: 1rem;
+}
+
+.placeholder {
+    overflow-y: scroll;
+    height: 50vh;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    padding-right: 10rem;
+    border-top: double 1px darkblue;
+    display: flex;
+    flex-direction: column;
+}
+
+
+main {
+    margin: 1em;
+}

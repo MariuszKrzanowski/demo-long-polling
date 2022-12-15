@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	<AssemblyName>MrMatrix.Net.LongPolling.Consumer</AssemblyName>
+	<RootNamespace>MrMatrix.Net.LongPolling.Consumer</RootNamespace>
+	<Authors>Mr Matrix Mariusz Krzanowski</Authors>
+	<Copyright>Mr Matrix Mariusz Krzanowski (c) 2022</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0" />
+  </ItemGroup>
+
+</Project>
