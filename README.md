@@ -1,5 +1,5 @@
 # Long polling as a cure for message push mechanism
-This repository contains source code to the blog article published on page https://mrmatrix.net/
+This repository contains source code to the blog article published on page https://mrmatrix.net/2022/12/long-polling-as-a-cure-for-message-push-mechanism/
 
 ## Folders structure
 
