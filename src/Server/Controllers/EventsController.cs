@@ -34,9 +34,11 @@ public sealed class EventsController : ControllerBase
     [Produces("application/x-ndjson")]
     public async IAsyncEnumerable<EventPayload> Get(int globalSequenceNumber = 0, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+        _logger.LogInformation("Consumer connected");
+
         cancellationToken.Register(() =>
         {
-            _logger.LogWarning("Canceled");
+            _logger.LogWarning("Consumer disconnected");
         });
 
         /*
