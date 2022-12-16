@@ -1,43 +1,60 @@
 ﻿/*
+  This file is based on jfsiii gist: showing how to download chunks messages by JavaScript
+  https://gist.github.com/jfsiii/034152ecfa908cf66178 
+*/
 
-This file is based on jfsiii gist: showing how to download chunks messages by JavaScript
--  https://gist.github.com/jfsiii/034152ecfa908cf66178 
-
- */
+const chunkedUrlTemplate = "/Events/next/gsn/";
+const appendRangeUrl = "/Events/append-range";
+const lastSequenceNumber = /(.*["]gsn["]:)(\d+)([,]["]payload.*)/;
 
 window.addEventListener("load", () => {
-  const placeholder = document.querySelector("[data-placeholder]");
-  const chunkedUrlTemplate = "/events/next/gsn/";
-  const appendRangeUrl = "/events/append-range";
-  const lastSequenceNumber = /(.*["]gsn["]:)(\d+)([,]["]payload.*)/;
+  let longPollingAbortController = new AbortController();
 
+  const mainForm = document.querySelector("form");
+  const placeholder = document.querySelector("[data-placeholder]");
   const abortButton = document.querySelector("[data-abort]");
   const synchronizeButton = document.querySelector("[data-synchronize]");
   const resetGsnButton = document.querySelector("[data-reset-gsn]");
   const appendRangeButton = document.querySelector("[data-append-range]");
   const cleanButton = document.querySelector("[data-clean]");
   const gsnInput = document.querySelector("[data-gsn]");
-  gsnInput.text = "0";
+  gsnInput.value = "0";
+
+  mainForm.addEventListener("submit", () => {
+    return false;
+  });
 
   // window.lastSequenceNumber = lastSequenceNumber; // <== uncomment for debugging
 
-  var abortController = null;
-
   appendRangeButton.addEventListener("click", () => {
     console.log("manual command: append range");
-    let arr = [];
-    let i;
-    for (i = 0; i < 1000; i++) {
-      arr.push("chunk-" + i);
+    const appendChunks = [];
+    let idx = 0;
+    for (idx = 0; idx < 1000; idx++) {
+      appendChunks.push("chunk-" + idx);
     }
+
+    const jsonBody = JSON.stringify(appendChunks);
+    console.log(jsonBody);
 
     fetch(appendRangeUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        accept: "*/*",
       },
-      body: JSON.stringify(arr),
-    });
+      body: jsonBody,
+    })
+      .then((r) => {
+        console.log("then 1");
+      })
+      .then((r) => {
+        console.log("then 2");
+      })
+      .catch((err) => {
+        console.error(err);
+        alert(err);
+      });
   });
 
   cleanButton.addEventListener("click", () => {
@@ -50,20 +67,25 @@ window.addEventListener("load", () => {
   });
 
   abortButton.addEventListener("click", () => {
-    abortController?.abort();
-    abortController = null;
+    longPollingAbortController.abort();
     console.log("manual command: abort");
   });
 
   synchronizeButton.addEventListener("click", () => {
     console.log("manual command: synchronize");
-    abortController?.abort();
+    longPollingAbortController.abort();
     const gsn = gsnInput.value;
-    abortController = new AbortController();
-    const signal = abortController.signal;
+    longPollingAbortController = new AbortController();
+    const signal = longPollingAbortController.signal;
     const fetchUrl = chunkedUrlTemplate + gsn;
 
-    fetch(fetchUrl, { signal })
+    fetch(fetchUrl, {
+      signal: signal,
+      headers: {
+        "Content-Type": "application/json",
+        accept: "application/x-ndjson",
+      },
+    })
       .then(processChunkedResponse)
       .then(onChunkedResponseComplete)
       .catch(onChunkedResponseError);
@@ -114,7 +136,7 @@ window.addEventListener("load", () => {
 
       if (result.done) {
         console.log("returning");
-        
+
         return chunk;
       } else {
         console.log("recursing");

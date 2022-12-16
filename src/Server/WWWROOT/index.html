@@ -2,11 +2,11 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title></title>
-    <link rel="shortcut icon" href="img/icon.svg" type="image/svg">
+    <title>Long polling web customer</title>
+    <link rel="shortcut icon" href="img/icon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="css/reset.css" />
     <link rel="stylesheet" href="css/main.css" />
-    <script src="js/main.js" type="module" defer ></script>
+    <script type="module" src="js/main.js" defer ></script>
   </head>
   <body>
     <header>
@@ -14,13 +14,13 @@
       <p>This web interface is used to debug and test long polling server.</p>
     </header>
     <main>
-      <form action="#">
-        <button data-synchronize="data-synchronize">Synchronize</button>
-        <button data-abort="data-abort">Abort</button>
-        <button data-clean="data-clean">Clean output</button>
-        <button data-reset-gsn="data-reset-gsn">Reset gsn</button>
+      <form  action="#" >
+        <button  data-synchronize="data-synchronize">Synchronize</button>
+        <button  data-abort="data-abort">Abort</button>
+        <button  data-clean="data-clean">Clean output</button>
+        <button  data-reset-gsn="data-reset-gsn">Reset gsn</button>
         <input data-gsn="data-gsn" value="0" type="number" />
-        <button data-append-range="data-append-range">Append range</button>
+        <button  data-append-range="data-append-range">Append range</button>
         <a target="swagger" href="/swagger">Swagger</a>
       </form>
       <div
