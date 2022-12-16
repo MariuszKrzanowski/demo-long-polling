@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MrMatrix.Net.LongPolling.WebServer.Models;
+using MrMatrix.Net.LongPolling.Server.Models;
 using System.Runtime.CompilerServices;
 
 namespace MrMatrix.Net.LongPolling.WebServer.Controllers;
@@ -8,13 +8,14 @@ namespace MrMatrix.Net.LongPolling.WebServer.Controllers;
 [Route("[controller]")]
 public sealed class EventsController : ControllerBase
 {
-    private static volatile TaskCompletionSource _taskCompletionSource = new TaskCompletionSource();
-
+    private static TaskCompletionSource _taskCompletionSource = new ();
     /* 
         Emulation of external store for events.
         Keep in mind that this store is in memory, so be aware of out of memory exception.
     */
     private static SynchronizedCollection<string> _payloads = new();
+   
+    
     private readonly ILogger<EventsController> _logger;
 
     public EventsController(ILogger<EventsController> logger)
@@ -71,24 +72,24 @@ public sealed class EventsController : ControllerBase
     /// Appends single payload to the store.
     /// </summary>
     /// <param name="payload">The payload to be added.</param>
-    [HttpPost()]
-    [Route("append")]
-    public void Append([FromBody] string payload)
+    [HttpPost("append")]
+    public IActionResult Append([FromBody] string payload)
     {
         _payloads.Add(payload);
         TriggerTaskCompletion();
+        return NoContent();
     }
 
     /// <summary>
     /// Appends multiple payloads to the store.
     /// </summary>
     /// <param name="payloads">The payloads collection to be added.</param>
-    [HttpPost()]
-    [Route("append-range")]
-    public void AppendRange([FromBody] List<string> payloads)
+    [HttpPost("append-range")]
+    public IActionResult AppendRange([FromBody] List<string> payloads)
     {
         payloads.ForEach(_payloads.Add);
         TriggerTaskCompletion();
+        return NoContent();
     }
 
     private void TriggerTaskCompletion()

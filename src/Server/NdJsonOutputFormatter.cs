@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Formatters;
-using MrMatrix.Net.LongPolling.WebServer.Models;
+using MrMatrix.Net.LongPolling.Server.Models;
 using System.Text.Json;
 
 public sealed class NdJsonOutputFormatter : OutputFormatter
