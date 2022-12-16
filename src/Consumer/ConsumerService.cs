@@ -52,10 +52,10 @@ public class ConsumerService : IHostedService
         {
             return;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             var message = ex.Message;
-            _logger.LogCritical("Critical error, listening is off {Message}" ,message);
+            _logger.LogCritical("Critical error, listening is off {Message}", message);
         }
     }
 

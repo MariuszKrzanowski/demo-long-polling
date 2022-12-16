@@ -8,14 +8,13 @@ namespace MrMatrix.Net.LongPolling.Server.Controllers;
 [Route("[controller]")]
 public sealed class EventsController : ControllerBase
 {
-    private static TaskCompletionSource _taskCompletionSource = new ();
+    private static TaskCompletionSource _taskCompletionSource = new();
     /* 
         Emulation of external store for events.
         Keep in mind that this store is in memory, so be aware of out of memory exception.
     */
     private static SynchronizedCollection<string> _payloads = new();
-   
-    
+
     private readonly ILogger<EventsController> _logger;
 
     public EventsController(ILogger<EventsController> logger)
