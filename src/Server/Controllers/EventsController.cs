@@ -9,9 +9,12 @@ namespace MrMatrix.Net.LongPolling.WebServer.Controllers;
 public sealed class EventsController : ControllerBase
 {
     private static volatile TaskCompletionSource _taskCompletionSource = new TaskCompletionSource();
-    
-    // Emulation of external store for events
-    private static SynchronizedCollection<string> _payloads = new SynchronizedCollection<string>(); 
+
+    /* 
+        Emulation of external store for events.
+        Keep in mind that this store is in memory, so be aware of out of memory exception.
+    */
+    private static SynchronizedCollection<string> _payloads = new();
     private readonly ILogger<EventsController> _logger;
 
     public EventsController(ILogger<EventsController> logger)
@@ -36,12 +39,14 @@ public sealed class EventsController : ControllerBase
             _logger.LogWarning("Canceled");
         });
 
-
         /*
          This trick sends first bytes in first message chunk - mesage formater can handle it. 
          It allows to send headers and fight with 100 seconds default timeout for HttpClient.
+
+         Comment out line below to get in the Consumer error:
+         `The request was canceled due to the configured HttpClient.Timeout of 100 seconds elapsing.`
          */
-        yield return null!; 
+        await this.HttpContext.Response.WriteAsync(" ", cancellationToken); // <== HttpClient.Timeout hack.
 
         for (var gsn = globalSequenceNumber; !cancellationToken.IsCancellationRequested; gsn++)
         {
@@ -71,11 +76,8 @@ public sealed class EventsController : ControllerBase
     public void Append([FromBody] string payload)
     {
         _payloads.Add(payload);
-        var newTcs = new TaskCompletionSource();
-        var previousTcs = Interlocked.Exchange(ref _taskCompletionSource, newTcs);
-        previousTcs.TrySetResult();
+        TriggerTaskCompletion();
     }
-
 
     /// <summary>
     /// Appends multiple payloads to the store.
@@ -86,8 +88,21 @@ public sealed class EventsController : ControllerBase
     public void AppendRange([FromBody] List<string> payloads)
     {
         payloads.ForEach(_payloads.Add);
+        TriggerTaskCompletion();
+    }
+
+    private void TriggerTaskCompletion()
+    {
         var newTcs = new TaskCompletionSource();
         var previousTcs = Interlocked.Exchange(ref _taskCompletionSource, newTcs);
-        previousTcs.TrySetResult();
+
+        if (previousTcs.TrySetResult())
+        {
+            _logger.LogInformation("TaskCompletionSource.TrySetResult succeeded.");
+        }
+        else
+        {
+            _logger.LogWarning("TaskCompletionSource.TrySetResult failed.");
+        }
     }
 }

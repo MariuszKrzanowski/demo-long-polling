@@ -1,16 +1,16 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-public class LongPollingCustomerService : IHostedService
+public class ConsumerService : IHostedService
 {
     private const string RequestUri = "http://127.0.0.1:5286/events/head";
     private readonly IHostApplicationLifetime _hostApplicationLifetime;
-    private readonly ILogger<LongPollingCustomerService> _logger;
+    private readonly ILogger<ConsumerService> _logger;
     private readonly CancellationTokenSource _cancellationTokenSource;
     private readonly HttpClient _httpClient;
 
-    public LongPollingCustomerService(
-        IHostApplicationLifetime hostApplicationLifetime, ILogger<LongPollingCustomerService> logger)
+    public ConsumerService(
+        IHostApplicationLifetime hostApplicationLifetime, ILogger<ConsumerService> logger)
     {
         _hostApplicationLifetime = hostApplicationLifetime;
         _logger = logger;
@@ -35,21 +35,27 @@ public class LongPollingCustomerService : IHostedService
     }
     private async Task RunAsync(CancellationToken cancellationToken)
     {
-
+        _logger.LogInformation("Connecting to the server - listening starts.");
         try
         {
+            await Task.Delay(5000, cancellationToken); // Give 5 seconds for server to warm up
             var getChunkResponse = await _httpClient.GetAsync(RequestUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
             await using var responseStream = await getChunkResponse.Content.ReadAsStreamAsync(cancellationToken);
             using StreamReader streamReader = new StreamReader(responseStream);
             do
             {
                 var chunk = await streamReader.ReadLineAsync(cancellationToken);
-                _logger.LogInformation(chunk);
+                _logger.LogInformation("{chunk}", chunk);
             } while (!cancellationToken.IsCancellationRequested);
         }
         catch (TaskCanceledException ex) when (cancellationToken.Equals(ex.CancellationToken))
         {
             return;
+        }
+        catch(Exception ex)
+        {
+            var message = ex.Message;
+            _logger.LogCritical("Critical error, listening is off {Message}" ,message);
         }
     }
 

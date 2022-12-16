@@ -10,13 +10,16 @@
   <body>
     <header>
       <h1>Long polling web customer</h1>
+      <p>This web interface is used to debug and test long polling server.</p>
     </header>
     <main>
       <form action="#">
         <button data-synchronize="data-synchronize">Synchronize</button>
         <button data-abort="data-abort">Abort</button>
-        <button data-clean="data-clean">Clean</button>
+        <button data-clean="data-clean">Clean output</button>
+        <button data-reset-gsn="data-reset-gsn">Reset gsn</button>
         <input data-gsn="data-gsn" value="0" type="number" />
+        <button data-append-range="data-append-range">Append range</button>
         <a target="swagger" href="/swagger">Swagger</a>
       </form>
       <div

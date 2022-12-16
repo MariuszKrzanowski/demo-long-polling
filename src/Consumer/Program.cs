@@ -4,7 +4,7 @@ using Microsoft.Extensions.Hosting;
 await Host.CreateDefaultBuilder(args)
     .ConfigureServices(services =>
     {
-       services.AddHostedService<LongPollingCustomerService>();
+       services.AddHostedService<ConsumerService>();
     })
     .Build()
     .RunAsync();

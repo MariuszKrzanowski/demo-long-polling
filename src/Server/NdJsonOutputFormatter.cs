@@ -16,35 +16,24 @@ public sealed class NdJsonOutputFormatter : OutputFormatter
 
     public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
     {
-
         var httpContext = context.HttpContext;
 
         if (context.Object is IAsyncEnumerable<EventPayload> payloads)
         {
             try
             {
-
                 await foreach (var payload in payloads)
                 {
-                    /*
-                         This trick sends first bytes in first message chunk - message formatter can handle it. 
-                         It allows to send headers and fight with 100 seconds default timeout for HttpClient.
-                    */
-                    if (payload is null)
-                    {
-                        await httpContext.Response.WriteAsync($" ", httpContext.RequestAborted);
-                        continue;
-                    }
-
                     await httpContext.Response.WriteAsync(String.Concat(JsonSerializer.Serialize<EventPayload>(payload, SerializerOptions), "\n"), httpContext.RequestAborted);
                 }
             }
             catch (TaskCanceledException) when (httpContext.RequestAborted.IsCancellationRequested)
             {
+                // Task was canceled by a consumer.
             }
             return;
         }
 
-        throw new NotImplementedException();
+        throw new NotSupportedException($"Only IAsyncEnumerable<EventPayload> is supported. Unsupported type {context.ObjectType}");
     }
 }
