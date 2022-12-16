@@ -5,30 +5,30 @@ This file is based on jfsiii gist: showing how to download chunks messages by Ja
 
  */
 
-window.addEventListener('load', () => {
-  const placeholder = document.querySelector('[data-placeholder]');
-  const chunkedUrlTemplate = '/events/next/gsn/';
-  const appendRangeUrl = '/events/append-range';
+window.addEventListener("load", () => {
+  const placeholder = document.querySelector("[data-placeholder]");
+  const chunkedUrlTemplate = "/events/next/gsn/";
+  const appendRangeUrl = "/events/append-range";
   const lastSequenceNumber = /(.*["]gsn["]:)(\d+)([,]["]payload.*)/;
 
-  const abortButton = document.querySelector('[data-abort]');
-  const synchronizeButton = document.querySelector('[data-synchronize]');
-  const resetGsnButton = document.querySelector('[data-reset-gsn]');
-  const appendRangeButton = document.querySelector('[data-append-range]');
-  const cleanButton = document.querySelector('[data-clean]');
-  const gsnInput = document.querySelector('[data-gsn]');
-  gsnInput.text = '0';
+  const abortButton = document.querySelector("[data-abort]");
+  const synchronizeButton = document.querySelector("[data-synchronize]");
+  const resetGsnButton = document.querySelector("[data-reset-gsn]");
+  const appendRangeButton = document.querySelector("[data-append-range]");
+  const cleanButton = document.querySelector("[data-clean]");
+  const gsnInput = document.querySelector("[data-gsn]");
+  gsnInput.text = "0";
 
   // window.lastSequenceNumber = lastSequenceNumber; // <== uncomment for debugging
 
-  let abortController = new AbortController();
+  var abortController = null;
 
-  appendRangeButton.addEventListener('click', (ev) => {
-    console.log('manual command: append range');
+  appendRangeButton.addEventListener("click", () => {
+    console.log("manual command: append range");
     let arr = [];
     let i;
     for (i = 0; i < 1000; i++) {
-      arr.push('chunk-' + i);
+      arr.push("chunk-" + i);
     }
 
     fetch(appendRangeUrl, {
@@ -40,36 +40,37 @@ window.addEventListener('load', () => {
     });
   });
 
-  cleanButton.addEventListener('click', (ev) => {
-    placeholder.innerHTML = '';
-    console.log('manual command: clean');
+  cleanButton.addEventListener("click", () => {
+    placeholder.innerHTML = "";
+    console.log("manual command: clean");
   });
 
-  resetGsnButton.addEventListener('click', (ev) => {
-    gsnInput.value = '0';
+  resetGsnButton.addEventListener("click", () => {
+    gsnInput.value = "0";
   });
 
-  abortButton.addEventListener('click', (ev) => {
-    abortController.abort();
-    console.log('manual command: abort');
+  abortButton.addEventListener("click", () => {
+    abortController?.abort();
+    abortController = null;
+    console.log("manual command: abort");
   });
 
-  synchronizeButton.addEventListener('click', (ev) => {
-    console.log('manual command: synchronize');
-    abortController.abort();
+  synchronizeButton.addEventListener("click", () => {
+    console.log("manual command: synchronize");
+    abortController?.abort();
     const gsn = gsnInput.value;
     abortController = new AbortController();
+    const signal = abortController.signal;
+    const fetchUrl = chunkedUrlTemplate + gsn;
 
-    fetch(chunkedUrlTemplate + gsn, {
-      signal: abortController.signal,
-    })
+    fetch(fetchUrl, { signal })
       .then(processChunkedResponse)
       .then(onChunkedResponseComplete)
       .catch(onChunkedResponseError);
   });
 
   function onChunkedResponseComplete(result) {
-    console.log('all done!', result);
+    console.log("all done!", result);
   }
 
   function onChunkedResponseError(err) {
@@ -91,12 +92,12 @@ window.addEventListener('load', () => {
         stream: !result.done,
       });
 
-      const parts = chunk.split('\n');
+      const parts = chunk.split("\n");
       let lastGsn = gsnInput.value;
       parts.forEach((part) => {
         if (part) {
-          var payloadElement = document.createElement('span');
-          payloadElement.classList.add('payload');
+          var payloadElement = document.createElement("span");
+          payloadElement.classList.add("payload");
           payloadElement.appendChild(document.createTextNode(part));
 
           placeholder.appendChild(payloadElement);
@@ -109,15 +110,14 @@ window.addEventListener('load', () => {
       placeholder.scrollTop =
         placeholder.scrollHeight - placeholder.clientHeight;
       // window.exposedChunk = chunk; // <== uncomment for debugging
-      console.log('got chunk of', chunk.length, 'bytes');
+      console.log("got chunk of", chunk.length, "bytes");
 
       if (result.done) {
-        console.log('returning');
-
-        placeholder.appendChild(document.createElement('hr'));
+        console.log("returning");
+        
         return chunk;
       } else {
-        console.log('recursing');
+        console.log("recursing");
         return readChunk();
       }
     }
