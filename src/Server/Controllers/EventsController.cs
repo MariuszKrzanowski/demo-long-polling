@@ -2,7 +2,7 @@
 using MrMatrix.Net.LongPolling.Server.Models;
 using System.Runtime.CompilerServices;
 
-namespace MrMatrix.Net.LongPolling.WebServer.Controllers;
+namespace MrMatrix.Net.LongPolling.Server.Controllers;
 
 [ApiController]
 [Route("[controller]")]
