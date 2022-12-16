@@ -30,7 +30,7 @@ window.addEventListener("load", () => {
     console.log("manual command: append range");
     const appendChunks = [];
     let idx = 0;
-    for (idx = 0; idx < 1000; idx++) {
+    for (idx = 0; idx < 5000; idx++) {
       appendChunks.push("chunk-" + idx);
     }
 
