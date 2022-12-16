@@ -31,6 +31,10 @@ public sealed class NdJsonOutputFormatter : OutputFormatter
             {
                 // Task was canceled by a consumer.
             }
+            catch (OperationCanceledException) when (httpContext.RequestAborted.IsCancellationRequested) 
+            {
+                // Task was canceled by a consumer.
+            }
             return;
         }
 
