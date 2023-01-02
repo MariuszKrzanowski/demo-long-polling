@@ -8,7 +8,7 @@ namespace MrMatrix.Net.LongPolling.Server.Controllers;
 [Route("[controller]")]
 public sealed class EventsController : ControllerBase
 {
-    private static TaskCompletionSource _taskCompletionSource = new();
+    private static volatile TaskCompletionSource _taskCompletionSource = new();
     /* 
         Emulation of external store for events.
         Keep in mind that this store is in memory, so be aware of out of memory exception.
@@ -52,13 +52,15 @@ public sealed class EventsController : ControllerBase
 
         for (var gsn = globalSequenceNumber; !cancellationToken.IsCancellationRequested; gsn++)
         {
+            var task = _taskCompletionSource.Task;
             while (_payloads.Count <= gsn)
             {
-                await _taskCompletionSource.Task.WaitAsync(cancellationToken);
+                await task.WaitAsync(cancellationToken);
                 if (cancellationToken.IsCancellationRequested)
                 {
                     yield break;
                 }
+                task = _taskCompletionSource.Task;
             }
 
             yield return new EventPayload
