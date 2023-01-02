@@ -7,4 +7,5 @@ await Host.CreateDefaultBuilder(args)
         services.AddHostedService<ConsumerService>();
     })
     .Build()
-    .RunAsync();
+    .RunAsync()
+    .ConfigureAwait(false);

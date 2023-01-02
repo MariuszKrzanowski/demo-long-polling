@@ -24,7 +24,7 @@ public sealed class NdJsonOutputFormatter : OutputFormatter
             {
                 await foreach (var payload in payloads)
                 {
-                    await httpContext.Response.WriteAsync(String.Concat(JsonSerializer.Serialize<EventPayload>(payload, SerializerOptions), "\n"), httpContext.RequestAborted);
+                    await httpContext.Response.WriteAsync(String.Concat(JsonSerializer.Serialize<EventPayload>(payload, SerializerOptions), "\n"), httpContext.RequestAborted).ConfigureAwait(false);
                 }
             }
             catch (TaskCanceledException) when (httpContext.RequestAborted.IsCancellationRequested)

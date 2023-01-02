@@ -38,13 +38,13 @@ public class ConsumerService : IHostedService
         _logger.LogInformation("Connecting to the server - listening starts.");
         try
         {
-            await Task.Delay(5000, cancellationToken); // Give 5 seconds for server to warm up
-            var getChunkResponse = await _httpClient.GetAsync(RequestUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
-            await using var responseStream = await getChunkResponse.Content.ReadAsStreamAsync(cancellationToken);
+            await Task.Delay(5000, cancellationToken).ConfigureAwait(false); // Give 5 seconds for server to warm up
+            var getChunkResponse = await _httpClient.GetAsync(RequestUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+            await using var responseStream = await getChunkResponse.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using StreamReader streamReader = new StreamReader(responseStream);
             do
             {
-                var chunk = await streamReader.ReadLineAsync(cancellationToken);
+                var chunk = await streamReader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
                 _logger.LogInformation("{chunk}", chunk);
             } while (!cancellationToken.IsCancellationRequested);
         }

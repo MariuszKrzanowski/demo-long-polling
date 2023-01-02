@@ -48,14 +48,14 @@ public sealed class EventsController : ControllerBase
          Comment out line below to get in the Consumer error:
          `The request was canceled due to the configured HttpClient.Timeout of 100 seconds elapsing.`
          */
-        await this.HttpContext.Response.WriteAsync(" ", cancellationToken); // <== HttpClient.Timeout hack.
+        await this.HttpContext.Response.WriteAsync(" ", cancellationToken).ConfigureAwait(false); // <== HttpClient.Timeout hack.
 
         for (var gsn = globalSequenceNumber; !cancellationToken.IsCancellationRequested; gsn++)
         {
-            var task = _taskCompletionSource.Task;
+            var task = _taskCompletionSource.Task; // Task is taken first to avoid potential lock.
             while (_payloads.Count <= gsn)
             {
-                await task.WaitAsync(cancellationToken);
+                await task.WaitAsync(cancellationToken).ConfigureAwait(false);
                 if (cancellationToken.IsCancellationRequested)
                 {
                     yield break;
