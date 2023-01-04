@@ -10,3 +10,7 @@ This repository contains source code to the blog article published on page https
 
 For demo purpose JavaScript code based on GIST [https://gist.github.com/jfsiii/034152ecfa908cf66178](https://gist.github.com/jfsiii/034152ecfa908cf66178) is used. 
 To reuse that part of code check 3rd license first. When I wrote an article I could not find any license in GIST file.
+
+## The application and code review
+
+The application is presented and main concept is presented on my YouTube channel. The title of video is [[EN] Long Polling Demo - Raw Video](https://www.youtube.com/watch?v=SB4dgHnGEko).
